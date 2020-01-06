@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:attendances/screens/tabbar_pages.dart';
+import 'package:attendances/screens/user_pages.dart';
 import 'package:attendances/widgets/button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -45,21 +46,28 @@ class _LoginPagesState extends State<LoginPages> {
       isLoading = false;
     });
     if (response.statusCode == 200) {
-      savePref(res['data']['original']['token'], email, res['user']['nama']);
-      Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => TabbarPages()
-      ));
+      savePref(res['data']['original']['token'], email, res['user']['nama'], res['user']['qrcode']);
+      if(res['user']['status'] == '1'){
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => TabbarPages()
+        ));
+      }else{
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => UserPages()
+        ));
+      }
     } else {
       print("Email atau password tidak benar!");
     }
   }
 
-  savePref(String token, String email, String name) async {
+  savePref(String token, String email, String name, String qrcode) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString('token', token);
       pref.setString('email', email);
       pref.setString('name', name);
+      pref.setString('qrcode', qrcode);
     });
   }
 
